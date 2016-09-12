@@ -1,60 +1,72 @@
 /**
- * Copyright 2015, GeoSolutions Sas.
+ * Copyright 2016, GeoSolutions Sas.
  * All rights reserved.
  *
  * This source code is licensed under the BSD-style license found in the
  * LICENSE file in the root directory of this source tree.
  */
-
 const React = require('react');
-const Sortable = require('react-sortable-items');
+const update = require('react/lib/update');
 require('./css/groupchildren.css');
 
 const GroupChildren = React.createClass({
-    propTypes: {
-        node: React.PropTypes.object,
-        filter: React.PropTypes.func,
-        onSort: React.PropTypes.func
-    },
-    statics: {
-        inheritedPropTypes: ['node', 'filter', 'onSort']
-    },
-    getDefaultProps() {
-        return {
-            node: null,
-            filter: () => true,
-            onSort: null
-        };
-    },
-    render() {
-        let content = [];
-        if (this.props.children) {
-            let nodes = (this.props.node.nodes || [])
-                .filter((node) => this.props.filter(node, this.props.node));
-            let i = 0;
-            content = nodes.map((node) => (React.cloneElement(this.props.children, {
-                node: node,
-                key: node.id,
-                sortData: i++,
-                isDraggable: !!this.props.onSort
-            })));
-        }
-        if (this.props.onSort) {
-            return (
-                <div className="toc-group-children" >
-                    <Sortable minDragDistance={5} onSort={this.handleSort}>
-                        {content}
-                    </Sortable>
-                </div>
-            );
-        }
-        return (
-            <div className="toc-group-children" >{content}</div>
-        );
-    },
-    handleSort: function(reorder) {
-        this.props.onSort(this.props.node.id, reorder);
-    }
+            propTypes: {
+                node: React.PropTypes.object,
+                filter: React.PropTypes.func,
+                onSort: React.PropTypes.func,
+                moveNode: React.PropTypes.func,
+                index: React.PropTypes.number
+            },
+            statics: {
+                inheritedPropTypes: ['node', 'filter']
+            },
+			getInitialState: function() {
+    return {
+                    node: this.props.node,
+                    nodes: this.props.node.nodes,
+                    children: this.props.children,
+                    id: this.props.node.id,
+                    index: this.props.node.index,
+                    filter: this.props.filter
+                };
+},
+            getDefaultProps() {
+                return {
+                    node: null,
+                    filter: () => true
+                };
+            },
+            render() {
+                let content = [];
+
+                if (this.state.node) {
+                    let nodes = (this.state.nodes || []).filter((node) => this.state.filter(node, this.state.node));
+                    content = nodes.map((node, i) => (React.cloneElement(this.state.children, {
+                            node: node,
+                            key: node.id,
+                            index: i,
+                            isDraggable: !!this.props.onSort,
+                            moveNode: this.moveNode,
+                            parent: this.state.node.id
+                        })));
+                }
+                if (this.props.onSort) {
+                    return ( < div className = "toc-group-children" > {content} </div>);
+                }
+            },
+	moveNode(dragIndex, hoverIndex) {
+                const {nodes} = this.state;
+                const dragCard = nodes[dragIndex];
+
+                this.setState(update(this.state, {
+                    nodes: {
+                        $splice: [
+                            [dragIndex, 1],
+                            [hoverIndex, 0, dragCard]
+                        ]
+                    }
+                }));
+            }
 });
 
 module.exports = GroupChildren;
