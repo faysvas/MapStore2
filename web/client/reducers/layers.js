@@ -12,7 +12,7 @@ var {LAYER_LOADING, LAYER_LOAD, CHANGE_LAYER_PROPERTIES, CHANGE_GROUP_PROPERTIES
     } = require('../actions/layers');
 
 var assign = require('object-assign');
-var {isObject, isArray} = require('lodash');
+var {isObject, isArray, head} = require('lodash');
 
 const LayersUtils = require('../utils/LayersUtils');
 
@@ -196,11 +196,13 @@ function layers(state = [], action) {
                 }
                 return assign({}, layer);
             });
-
-            if (!sameGroup) {
+            let originalNode = head(flatLayers.filter((layer) => { return (layer[selector] === action.node || layer[selector].indexOf(action.node + '.') === 0); }));
+            if (!sameGroup && originalNode ) {
+                let newGroups = moveNode(state.groups, action.node, (action.options.group || 'Default'));
+                let orderedNewLayers = LayersUtils.sortLayers ? LayersUtils.sortLayers(newGroups, newLayers) : newLayers;
                 return assign({}, state, {
-                    flat: newLayers,
-                    groups: moveNode(state.groups, action.node, (action.options.group || 'Default'))
+                    flat: orderedNewLayers,
+                    groups: newGroups
                 });
             }
             return assign({}, state, {flat: newLayers});
@@ -250,8 +252,9 @@ function layers(state = [], action) {
                     newGroups = newGroup.concat(newGroups);
                 }
             }
+            let orderedNewLayers = LayersUtils.sortLayers ? LayersUtils.sortLayers(newGroups, newLayers) : newLayers;
             return {
-                    flat: newLayers,
+                    flat: orderedNewLayers,
                     groups: newGroups
             };
         }

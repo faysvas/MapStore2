@@ -10,7 +10,7 @@ module.exports = {
     pages: [{
         name: "home",
         path: "/",
-        component: require('./pages/Home')
+        component: require('./pages/Maps')
     }, {
         name: "maps",
         path: "/maps",
@@ -19,6 +19,14 @@ module.exports = {
         name: "mapviewer",
         path: "/viewer/:mapType/:mapId",
         component: require('./pages/MapViewer')
+    }, {
+        name: "manager",
+        path: "/manager",
+        component: require('./pages/Manager')
+    }, {
+        name: "manager",
+        path: "/manager/:tool",
+        component: require('./pages/Manager')
     }],
     pluginsDef: require('./plugins.js'),
     initialState: {

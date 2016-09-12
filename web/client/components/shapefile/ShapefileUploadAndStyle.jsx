@@ -15,7 +15,7 @@ const FileUtils = require('../../utils/FileUtils');
 let StyleUtils;
 const {Grid, Row, Col, Button} = require('react-bootstrap');
 
-const Combobox = require('react-widgets').Combobox;
+const Combobox = require('react-widgets').DropdownList;
 
 const SelectShape = require('./SelectShape');
 
@@ -112,7 +112,7 @@ const ShapeFileUploadAndStyle = React.createClass({
             <Row style={{textAlign: "center"}}>
                 {
             (this.props.selected) ?
-                <Combobox data={this.props.layers} value={this.props.selected} onChange={(value)=> this.props.onSelectLayer(value)}valueField={"id"} textField={"name"} /> :
+                <Combobox data={this.props.layers} value={this.props.selected} onSelect={(value)=> this.props.onSelectLayer(value)} valueField={"id"} textField={"name"} /> :
                 <SelectShape {...this.props.uploadOptions} errorMessage="shapefile.error.select" text={this.props.uploadMessage} onShapeChoosen={this.addShape}/>
             }
             </Row>
@@ -161,7 +161,7 @@ const ShapeFileUploadAndStyle = React.createClass({
         Promise.resolve(this.props.addShapeLayer( styledLayer )).then(() => {
             this.props.shapeLoading(false);
 
-            // calculates the bbox that contain last shapefile and the previous added
+            // calculates the bbox that contains all shapefiles added
             const bbox = this.props.layers[0].features.reduce((bboxtotal, feature) => {
                 return [
                     Math.min(bboxtotal[0], feature.geometry.bbox[0]),

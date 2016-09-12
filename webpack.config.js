@@ -24,7 +24,8 @@ module.exports = {
     },
     plugins: [
         new DefinePlugin({
-            "__DEVTOOLS__": true
+            "__DEVTOOLS__": true,
+            "__API_KEY_MAPQUEST__": JSON.stringify(process.env.__API_KEY_MAPQUEST__ || '')
         }),
         new NormalModuleReplacementPlugin(/leaflet$/, path.join(__dirname, "web", "client", "libs", "leaflet")),
         new NormalModuleReplacementPlugin(/cesium$/, path.join(__dirname, "web", "client", "libs", "cesium")),
@@ -58,14 +59,14 @@ module.exports = {
     devServer: {
         proxy: [{
             path: new RegExp("/mapstore/rest/geostore/(.*)"),
-            rewrite: rewriteUrl("/geostore/rest/$1"),
-            host: "mapstore.geo-solutions.it",
-            target: "http://mapstore.geo-solutions.it"
+            rewrite: rewriteUrl("/mapstore/rest/geostore/$1"),
+            host: "dev.mapstore2.geo-solutions.it",
+            target: "http://dev.mapstore2.geo-solutions.it"
         }, {
             path: new RegExp("/mapstore/proxy(.*)"),
-            rewrite: rewriteUrl("/http_proxy/proxy$1"),
-            host: "mapstore.geo-solutions.it",
-            target: "http://mapstore.geo-solutions.it"
+            rewrite: rewriteUrl("/mapstore/proxy$1"),
+            host: "dev.mapstore2.geo-solutions.it",
+            target: "http://dev.mapstore2.geo-solutions.it"
         }]
     },
 
